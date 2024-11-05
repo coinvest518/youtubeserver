@@ -1,5 +1,3 @@
-// Remove the TypeScript interface and use plain JavaScript objects instead
-
 // Function to analyze the transcript
 function analyzeTranscript(transcript) {
   if (!transcript || typeof transcript !== 'string') {
