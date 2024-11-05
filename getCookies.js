@@ -31,4 +31,4 @@ async function launchBrowser() {
     }
 }
 
-export default getCookies;
+launchBrowser();
