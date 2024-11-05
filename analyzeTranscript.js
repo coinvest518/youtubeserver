@@ -1,13 +1,7 @@
-export interface CharacterAnalysis {
-  youAreA: string;
-  personality: string;
-  background: string;
-  communicationStyle: string;
-  motivations: string;
-  examples: string[];
-}
+// Remove the TypeScript interface and use plain JavaScript objects instead
 
-export function analyzeTranscript(transcript: string): CharacterAnalysis {
+// Function to analyze the transcript
+function analyzeTranscript(transcript) {
   if (!transcript || typeof transcript !== 'string') {
     console.error("Invalid transcript input");
     return {
@@ -22,7 +16,7 @@ export function analyzeTranscript(transcript: string): CharacterAnalysis {
 
   // Example analysis logic (same as before)
   const ageClues = transcript.match(/(\d+)\s*(years\s*old|year\s*old|yo)/i);
-  let age: number | null = null;
+  let age = null;
   if (ageClues && ageClues[1]) {
     age = parseInt(ageClues[1], 10);
   }
@@ -42,3 +36,6 @@ export function analyzeTranscript(transcript: string): CharacterAnalysis {
     examples: [], // Fill based on analysis
   };
 }
+
+// Export the function to use it in index.js
+module.exports = { analyzeTranscript };
