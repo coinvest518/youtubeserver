@@ -1,6 +1,6 @@
 const express = require('express');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
-const ytdl = require('ytdl-core');
+const ytdl = require('@distube/ytdl-core');
 const fs = require('fs');
 const path = require('path');
 const { analyzeTranscript } = require('./analyzeTranscript'); // Import your analysis function
