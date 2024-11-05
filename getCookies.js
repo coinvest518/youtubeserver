@@ -1,5 +1,4 @@
-import puppeteer from 'puppeteer-core';
-import chromium from 'chrome-aws-lambda';
+import chromium from 'chrome-aws-lambda'; // Use chrome-aws-lambda
 
 async function getCookies() {
   const browser = await chromium.puppeteer.launch({
