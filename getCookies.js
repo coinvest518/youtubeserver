@@ -1,4 +1,3 @@
-// getCookies.js
 import puppeteer from 'puppeteer-core';
 import chromium from 'chrome-aws-lambda';
 
@@ -6,8 +5,8 @@ async function getCookies() {
   const browser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath,
-    headless: chromium.headless,
+    executablePath: await chromium.executablePath || '/usr/bin/chromium-browser',
+    headless: true,
   });
 
   const page = await browser.newPage();
@@ -30,4 +29,4 @@ async function getCookies() {
   return cookies;
 }
 
-export default getCookies
+export default getCookies;
