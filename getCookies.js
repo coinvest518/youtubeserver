@@ -1,11 +1,12 @@
-const puppeteer = require('puppeteer');
+// getCookies.js
+import puppeteer from 'puppeteer';
 
 async function getCookies() {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   await page.goto('https://www.youtube.com');
 
-  // Log in to YouTube
+  // Log in to YouTube (placeholder selectors; may need updating)
   await page.type('#email', 'coinvest518@gmail.com');
   await page.type('#password', 'Promisedivon518@');
   await page.click('#login-button');
@@ -22,4 +23,4 @@ async function getCookies() {
   return cookies;
 }
 
-module.exports = getCookies;
+export default getCookies;
