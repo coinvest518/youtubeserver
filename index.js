@@ -22,16 +22,15 @@ function extractVideoID(url) {
 
 // Function to get transcript using ytdl-core
 async function getTranscript(videoId) {
-  try {
-    const info = await ytdl.getInfo(videoId); // Use getInfo to get detailed video information
-    const captions = info.player_response.captions; // Access caption information
-
-    if (!captions || !captions.length) {
-      throw new Error('No transcript available');
-    }
+    try {
+      const info = await ytdl.getBasicInfo(videoId);
+      const transcriptUrl = info.player_response.captions;
+  
+      if (!transcriptUrl || !transcriptUrl.length) {
+        throw new Error('No transcript available');
+      }
 
     // Assuming the first caption track is the desired one; you can adjust this as needed
-    const transcriptUrl = captions[0].baseUrl; // Get the URL for the transcript
 
     // Fetch the actual transcript data
     const response = await fetch(transcriptUrl);
