@@ -1,5 +1,5 @@
 const express = require('express');
-const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const ytdl = require('ytdl-core');
 const { analyzeTranscript } = require('./analyzeTranscript'); // Ensure this path is correct
 
@@ -20,25 +20,33 @@ function extractVideoID(url) {
   return null;
 }
 
-// Placeholder function to get transcript using ytdl-core
+// Function to get transcript using ytdl-core
 async function getTranscript(videoId) {
-  return new Promise((resolve, reject) => {
-    ytdl.getBasicInfo(videoId, (err, info) => {
-      if (err) return reject(err);
-      
-      const transcriptUrl = info.player_response.captions; // Access caption information
-      if (!transcriptUrl || !transcriptUrl.length) {
-        return reject(new Error('No transcript available'));
-      }
+  try {
+    const info = await ytdl.getInfo(videoId); // Use getInfo to get detailed video information
+    const captions = info.player_response.captions; // Access caption information
 
-      // Process to get the actual transcript text (if available)
-      resolve({
-        title: info.title,
-        thumbnailUrl: info.thumbnail_url,
-        transcript: 'Mocked transcript data for example purposes.', // Replace with actual fetching of the transcript
-      });
-    });
-  });
+    if (!captions || !captions.length) {
+      throw new Error('No transcript available');
+    }
+
+    // Assuming the first caption track is the desired one; you can adjust this as needed
+    const transcriptUrl = captions[0].baseUrl; // Get the URL for the transcript
+
+    // Fetch the actual transcript data
+    const response = await fetch(transcriptUrl);
+    const transcriptData = await response.text(); // Depending on the format, parse the transcript accordingly
+
+    // Here, you should parse the transcript data into a readable format
+    // This is a placeholder; implement the parsing logic as necessary
+    return {
+      title: info.title,
+      thumbnailUrl: info.thumbnail_url,
+      transcript: transcriptData, // Replace with the actual transcript text
+    };
+  } catch (err) {
+    throw new Error(`Error fetching transcript: ${err.message}`);
+  }
 }
 
 app.post('/api/transcribe', async (req, res) => {
@@ -67,7 +75,7 @@ app.post('/api/transcribe', async (req, res) => {
     });
   } catch (error) {
     console.error('Error processing transcript:', error);
-    return res.status(500).json({ error: 'Failed to process transcript' });
+    return res.status(500).json({ error: error.message || 'Failed to process transcript' });
   }
 });
 
