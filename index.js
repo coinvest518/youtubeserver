@@ -3,12 +3,17 @@ const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fet
 const ytdl = require('@distube/ytdl-core');
 const fs = require('fs');
 const path = require('path');
-const { analyzeTranscript } = require('./analyzeTranscript'); // Import your analysis function
+const getCookies = require('./getCookies');
+const { analyzeTranscript } = require('./analyzeTranscript');
 
 const app = express();
 app.use(express.json());
 
 const ASSEMBLYAI_API_KEY = 'YOUR_ASSEMBLYAI_API_KEY';
+
+// Get the cookies using Puppeteer
+const cookies = await getCookies();
+const agent = ytdl.createAgent(cookies);
 
 // Helper function to extract video ID
 function extractVideoID(url) {
@@ -24,18 +29,18 @@ function extractVideoID(url) {
 }
 
 // Download video and save to disk
-async function downloadVideo(videoId) {
-  const filePath = path.resolve(__dirname, `${videoId}.mp4`);
-  const videoStream = ytdl(videoId, { filter: 'audioandvideo', quality: 'highest' });
-
-  await new Promise((resolve, reject) => {
-    videoStream.pipe(fs.createWriteStream(filePath))
-      .on('finish', resolve)
-      .on('error', reject);
-  });
-
-  return filePath;
-}
+async function downloadVideo(videoId, options = {}) {
+    const filePath = path.resolve(__dirname, `${videoId}.mp4`);
+    const videoStream = ytdl(videoId, { filter: 'audioandvideo', quality: 'highest', ...options });
+  
+    await new Promise((resolve, reject) => {
+      videoStream.pipe(fs.createWriteStream(filePath))
+        .on('finish', resolve)
+        .on('error', reject);
+    });
+  
+    return filePath;
+  }
 
 // Upload video to AssemblyAI and get the transcript
 async function getTranscriptFromAssemblyAI(filePath) {
@@ -76,36 +81,36 @@ async function getTranscriptFromAssemblyAI(filePath) {
 }
 
 app.post('/api/transcribe', async (req, res) => {
-  const { url } = req.body;
-
-  if (!url) {
-    return res.status(400).json({ error: 'Invalid URL' });
-  }
-
-  try {
-    const videoId = extractVideoID(url);
-    if (!videoId) {
-      return res.status(400).json({ error: 'Could not extract video ID from URL' });
+    const { url } = req.body;
+  
+    if (!url) {
+      return res.status(400).json({ error: 'Invalid URL' });
     }
-
-    const filePath = await downloadVideo(videoId); // Download the video
-    const transcriptText = await getTranscriptFromAssemblyAI(filePath); // Get transcription text
-
-    // Clean up the downloaded file
-    fs.unlinkSync(filePath);
-
-    // Analyze the transcript
-    const analyzedTranscript = analyzeTranscript(transcriptText);
-
-    return res.status(200).json({
-      videoTitle: videoId, // Can replace with actual title if necessary
-      transcript: analyzedTranscript,
-    });
-  } catch (error) {
-    console.error('Error processing transcript:', error);
-    return res.status(500).json({ error: 'Failed to process transcript' });
-  }
-});
+  
+    try {
+      const videoId = extractVideoID(url);
+      if (!videoId) {
+        return res.status(400).json({ error: 'Could not extract video ID from URL' });
+      }
+  
+      const filePath = await downloadVideo(videoId, { agent });
+      const transcriptText = await getTranscriptFromAssemblyAI(filePath);
+  
+      // Clean up the downloaded file
+      fs.unlinkSync(filePath);
+  
+      // Analyze the transcript
+      const analyzedTranscript = analyzeTranscript(transcriptText);
+  
+      return res.status(200).json({
+        videoTitle: videoId, // Can replace with actual title if necessary
+        transcript: analyzedTranscript,
+      });
+    } catch (error) {
+      console.error('Error processing transcript:', error);
+      return res.status(500).json({ error: 'Failed to process transcript' });
+    }
+  });
 
 // Start the server
 const PORT = process.env.PORT || 3000;
