@@ -6,7 +6,7 @@ async function getCookies() {
   const page = await browser.newPage();
   await page.goto('https://www.youtube.com');
 
-  // Log in to YouTube (placeholder selectors; may need updating)
+  // Log in to YouTube (ensure selectors match actual page structure)
   await page.type('#email', 'coinvest518@gmail.com');
   await page.type('#password', 'Promisedivon518@');
   await page.click('#login-button');
