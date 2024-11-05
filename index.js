@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import ytdl from '@distube/ytdl-core';
 import fs from 'fs';
 import path from 'path';
-import launchBrowser from './getCookies.js'; // Import the function correctly
+import  launchBrowser  from './getCookies.js'; // Import the function correctly
 import { analyzeTranscript } from './analyzeTranscript.js';
 
 const app = express();
