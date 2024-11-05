@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import ytdl from '@distube/ytdl-core';
 import fs from 'fs';
 import path from 'path';
-import { getCookies } from './getCookies.js';
+import  getCookies  from './getCookies.js';
 import { analyzeTranscript } from './analyzeTranscript.js';
 
 const app = express();
