@@ -1,40 +1,28 @@
-import puppeteer from 'puppeteer';
+const puppeteer = require('puppeteer');
 
-async function launchBrowser() {
-    let browser;
-    try {
-        browser = await puppeteer.launch({
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--headless', '--disable-gpu'],
-        });
-        const page = await browser.newPage();
-        await page.goto('https://accounts.google.com/signin/v2/identifier?service=youtube');
+(async () => {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
 
-        // Enter email
-        await page.waitForSelector('input[type="email"]');
-        await page.type('input[type="email"]', 'coinvest518@gmail.com');
-        await page.click('#identifierNext');
+    // Navigate the page to a URL.
+    await page.goto('https://developer.chrome.com/');
 
-        // Enter password
-        await page.waitForSelector('input[type="password"]', { visible: true });
-        await page.type('input[type="password"]', 'Promiedivon518@');
-        await page.click('#passwordNext');
+    // Set screen size.
+    await page.setViewport({width: 1080, height: 1024});
 
-        // Wait for navigation to complete
-        await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    // Type into search box.
+    await page.locator('.devsite-search-field').fill('automate beyond recorder');
 
-        // Go to YouTube homepage
-        await page.goto('https://www.youtube.com');
+    // Wait and click on first result.
+    const resultLink = await page.locator('.devsite-result-item-link').first();
+    await resultLink.click();
 
-        // Get the cookies
-        const cookies = await page.cookies();
-        return cookies;
-    } catch (error) {
-        console.error('Error launching browser:', error);
-    } finally {
-        if (browser) {
-            await browser.close();
-        }
-    }
-}
+    // Locate the full title with a unique string.
+    const fullTitleSelector = await page.locator('text=Customize and automate');
+    const fullTitle = await fullTitleSelector.evaluate(el => el.textContent);
 
-export default launchBrowser;
+    // Print the full title.
+    console.log('The title of this blog post is "%s".', fullTitle);
+
+    await browser.close();
+})();
