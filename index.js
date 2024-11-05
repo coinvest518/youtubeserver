@@ -1,10 +1,10 @@
-const express = require('express');
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
-const ytdl = require('@distube/ytdl-core');
-const fs = require('fs');
-const path = require('path');
-const getCookies = require('./getCookies');
-const { analyzeTranscript } = require('./analyzeTranscript');
+import express from 'express';
+import fetch from 'node-fetch';
+import ytdl from '@distube/ytdl-core';
+import fs from 'fs';
+import path from 'path';
+import getCookies from './getCookies.js';
+import { analyzeTranscript } from './analyzeTranscript.js';
 
 const app = express();
 app.use(express.json());
